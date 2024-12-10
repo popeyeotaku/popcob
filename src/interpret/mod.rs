@@ -4,10 +4,10 @@ use crate::{compile::Program, src::Error};
 
 /// The result of interpretation.
 pub struct Output {
-    pub strout:String
+    pub strout: String,
 }
 
 /// Interpret a compiled program.
-pub fn interpret(program:&Program) -> Result<Output, Error> {
+pub fn interpret(program: &Program) -> Result<Output, Error> {
     todo!()
 }

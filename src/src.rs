@@ -1,11 +1,17 @@
 use std::{fmt::Display, rc::Rc};
 
 /// Indicates a position within a source file.
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct Pos {
     pub filename: Rc<String>,
     pub linenum: u32,
     pub charpos: u16,
+}
+
+impl Pos {
+    pub fn new(filename:Rc<String>, linenum:u32, charpos:u16) -> Self {
+        Self { filename, linenum, charpos }
+    }
 }
 
 impl Display for Pos {

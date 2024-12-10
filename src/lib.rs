@@ -7,8 +7,8 @@ use src::{Error, Src};
 /// Compile and execute the given source file.
 ///
 /// Returns the string output file, if any.
-pub fn execute(paths:&[String]) -> Result<String, Box<dyn std::error::Error>> {
-    let mut sources:Vec<Src> = Vec::with_capacity(paths.len());
+pub fn execute(paths: &[String]) -> Result<String, Box<dyn std::error::Error>> {
+    let mut sources: Vec<Src> = Vec::with_capacity(paths.len());
     for path in paths {
         let text = fs::read_to_string(path)?;
         sources.push(Src::new(path.to_string(), text));
@@ -17,13 +17,13 @@ pub fn execute(paths:&[String]) -> Result<String, Box<dyn std::error::Error>> {
 }
 
 /// Execute source from a string instead of a file.
-pub fn exec_str(source:&str) -> Result<String, Error> {
-    let sources = [Src::new( "{string}".to_string(), source.to_string())];
+pub fn exec_str(source: &str) -> Result<String, Error> {
+    let sources = [Src::new("{string}".to_string(), source.to_string())];
     exec(&sources)
 }
 
 /// Compile and execute from some source files.
-fn exec(srcs:&[Src]) -> Result<String, Error> {
+fn exec(srcs: &[Src]) -> Result<String, Error> {
     let program = compile::compile(srcs)?;
     let output = interpret::interpret(&program)?;
     Ok(output.strout)
