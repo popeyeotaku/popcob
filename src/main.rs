@@ -4,11 +4,11 @@ use clap::Parser;
 
 fn main() {
     let args = Args::parse();
-    popcob::execute(&args.source).unwrap();
+    popcob::execute(&args.sources).unwrap();
 }
 
 #[derive(clap::Parser)]
 #[command(about, version)]
 struct Args {
-    source: String,
+    sources: Vec<String>,
 }
