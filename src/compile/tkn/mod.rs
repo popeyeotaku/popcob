@@ -13,6 +13,73 @@ impl Tokens {
     }
 }
 
+/// Allows consuming tokens via Tkn match.
+pub struct Muncher<'a> {
+    tokens: &'a [Token],
+    i: usize,
+}
+
+impl<'a> Muncher<'a> {
+    pub fn new(tkns: &'a [Token]) -> Self {
+        Self { tokens: tkns, i: 0 }
+    }
+
+    /// Return a flag for if we're out of tokens.
+    pub fn at_end(&self) -> bool {
+        self.i >= self.tokens.len()
+    }
+
+    /// Return the current token index.
+    pub fn cur_index(&self) -> usize {
+        self.i
+    }
+
+    /// If the current Token at the given position the given Tkn, return it.
+    #[inline]
+    fn peek_at(&mut self, i: usize, tkn: Tkn) -> Option<&'a Token> {
+        self.tokens.get(i).filter(|t| t.tkn(tkn))
+    }
+
+    /// If the current Token matches the given Tkn, return it.
+    pub fn peek(&mut self, tkn: Tkn) -> Option<&'a Token> {
+        self.peek_at(self.i, tkn)
+    }
+
+    /// If the current Token matches the given Tkn, skip past it and
+    /// return it.
+    pub fn grab(&mut self, tkn: Tkn) -> Option<&'a Token> {
+        if let Some(t) = self.peek(tkn) {
+            self.i += 1;
+            Some(t)
+        } else {
+            None
+        }
+    }
+
+    /// If the next n Tokens match the given n Tkns, return them all.
+    pub fn peekem(&mut self, tkns: &[Tkn]) -> Option<Vec<&'a Token>> {
+        let mut tokens: Vec<&Token> = Vec::with_capacity(tkns.len());
+        for (j, tkn) in tkns.iter().enumerate() {
+            if let Some(t) = self.peek_at(self.i + j, *tkn) {
+                tokens.push(t);
+            } else {
+                return None;
+            }
+        }
+        Some(tokens)
+    }
+
+    /// If the next n Tokens match the given n Tkns, return them all, and advance past them.
+    pub fn grabem(&mut self, tkns: &[Tkn]) -> Option<Vec<&'a Token>> {
+        if let Some(t) = self.peekem(tkns) {
+            self.i += t.len();
+            Some(t)
+        } else {
+            None
+        }
+    }
+}
+
 /// Iterates over sentences.
 ///
 /// A sentence is defined as a series of tokens seperated by a Dot token.
@@ -66,6 +133,57 @@ impl<'a> Iterator for Paragraphs<'a> {
         } else {
             None
         }
+    }
+}
+
+/// Allows creation of various Token iterators for anything that holds Token references.
+pub trait TokenHolder {
+    fn token_slice(&self) -> &[Token];
+    fn muncher(&self) -> Muncher {
+        Muncher {
+            tokens: self.token_slice(),
+            i: 0,
+        }
+    }
+    fn sentences(&self) -> Sentences {
+        Sentences {
+            tokens: self.token_slice(),
+            i: 0,
+        }
+    }
+    fn paragraphs(&self) -> Paragraphs {
+        Paragraphs {
+            tokens: self.token_slice(),
+            i: 0,
+        }
+    }
+}
+
+impl TokenHolder for Tokens {
+    #[inline]
+    fn token_slice(&self) -> &[Token] {
+        &self.tokens
+    }
+}
+
+impl TokenHolder for Paragraphs<'_> {
+    #[inline]
+    fn token_slice(&self) -> &[Token] {
+        self.tokens
+    }
+}
+
+impl TokenHolder for Sentences<'_> {
+    #[inline]
+    fn token_slice(&self) -> &[Token] {
+        self.tokens
+    }
+}
+
+impl TokenHolder for Muncher<'_> {
+    #[inline]
+    fn token_slice(&self) -> &[Token] {
+        &self.tokens[self.i..]
     }
 }
 
