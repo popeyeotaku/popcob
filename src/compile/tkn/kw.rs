@@ -1,4 +1,4 @@
-pub static KW_TAB:[&str; 13] = [
+pub static KW_TAB: [&str; 13] = [
     "PROCEDURE",
     "DIVISION",
     "DISPLAY",
@@ -14,7 +14,7 @@ pub static KW_TAB:[&str; 13] = [
     "IS",
 ];
 
-#[derive(PartialEq,Clone,Copy)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum Kw {
     Procedure,
     Division,

@@ -42,6 +42,33 @@ impl<'a> Iterator for Sentences<'a> {
     }
 }
 
+/// An iterator over paragraphs.
+pub struct Paragraphs<'a> {
+    tokens: &'a [Token],
+    i: usize,
+}
+
+impl<'a> Iterator for Paragraphs<'a> {
+    type Item = &'a [Token];
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.i < self.tokens.len() && self.tokens[self.i].tkn(Tkn::Paragraph) {
+            self.i += 1;
+        }
+        if self.i < self.tokens.len() {
+            let start = self.i;
+            let mut stop = start;
+            while stop < self.tokens.len() && !self.tokens[stop].tkn(Tkn::Paragraph) {
+                stop += 1;
+            }
+            self.i = stop;
+            Some(&self.tokens[start..stop])
+        } else {
+            None
+        }
+    }
+}
+
 mod kw;
 mod token;
 
@@ -51,7 +78,7 @@ mod tests {
 
     use crate::src;
 
-    use super::{Kw, Sentences, Tkn, Token};
+    use super::{Kw, Paragraphs, Sentences, Tkn, Token};
 
     #[test]
     fn test_sentence() {
@@ -72,11 +99,45 @@ mod tests {
             [Tkn::Kw(Kw::Data), Tkn::Kw(Kw::Division), Tkn::Dot],
             [Tkn::Kw(Kw::Environment), Tkn::Kw(Kw::Division), Tkn::Dot],
         ];
-        let i = Sentences {
+        let mut i = Sentences {
             tokens: &tkns,
             i: 0,
         };
         for (left, right) in i.zip(&sentences) {
+            assert_eq!(left.len(), right.len());
+            for (l, r) in left.iter().zip(right) {
+                assert!(l.tkn(*r));
+            }
+        }
+    }
+
+    #[test]
+    fn test_paragraphs() {
+        let pos = src::Pos::new(Rc::new("{test}".to_string()), 1, 1);
+        let tkns = [
+            Token::new(Tkn::Kw(Kw::Procedure), pos.clone()),
+            Token::new(Tkn::Kw(Kw::Division), pos.clone()),
+            Token::new(Tkn::Dot, pos.clone()),
+            Token::new(Tkn::Paragraph, pos.clone()),
+            Token::new(Tkn::Kw(Kw::Data), pos.clone()),
+            Token::new(Tkn::Kw(Kw::Division), pos.clone()),
+            Token::new(Tkn::Dot, pos.clone()),
+            Token::new(Tkn::Paragraph, pos.clone()),
+            Token::new(Tkn::Kw(Kw::Environment), pos.clone()),
+            Token::new(Tkn::Kw(Kw::Division), pos.clone()),
+            Token::new(Tkn::Dot, pos.clone()),
+            Token::new(Tkn::Paragraph, pos.clone()),
+        ];
+        let paragraphs = [
+            [Tkn::Kw(Kw::Procedure), Tkn::Kw(Kw::Division), Tkn::Dot],
+            [Tkn::Kw(Kw::Data), Tkn::Kw(Kw::Division), Tkn::Dot],
+            [Tkn::Kw(Kw::Environment), Tkn::Kw(Kw::Division), Tkn::Dot],
+        ];
+        let mut i = Paragraphs {
+            tokens: &tkns,
+            i: 0,
+        };
+        for (left, right) in i.zip(&paragraphs) {
             assert_eq!(left.len(), right.len());
             for (l, r) in left.iter().zip(right) {
                 assert!(l.tkn(*r));

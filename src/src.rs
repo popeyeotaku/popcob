@@ -9,8 +9,12 @@ pub struct Pos {
 }
 
 impl Pos {
-    pub fn new(filename:Rc<String>, linenum:u32, charpos:u16) -> Self {
-        Self { filename, linenum, charpos }
+    pub fn new(filename: Rc<String>, linenum: u32, charpos: u16) -> Self {
+        Self {
+            filename,
+            linenum,
+            charpos,
+        }
     }
 }
 

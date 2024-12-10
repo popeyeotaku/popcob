@@ -21,22 +21,26 @@ impl Token {
 
     /// Construct a token with a value.
     pub fn valued(tkn: Tkn, pos: src::Pos, value: String) -> Self {
-        Self { tkn_type: tkn, pos, value:Some(value) }
+        Self {
+            tkn_type: tkn,
+            pos,
+            value: Some(value),
+        }
     }
 
     /// Return a flag if this token matches the `Tkn` enum type given.
-    pub fn tkn(&self, other:Tkn) -> bool {
+    #[inline]
+    pub fn tkn(&self, other: Tkn) -> bool {
         self.tkn_type == other
     }
 }
 
 /// The type of a token.
-#[derive(Copy,Clone,PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum Tkn {
     Literal,
     Word,
     Dot,
-    NamedPara,
-    UnnamedPara,
+    Paragraph,
     Kw(Kw),
 }
