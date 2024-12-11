@@ -45,7 +45,10 @@ pub enum LitPath {
 }
 
 /// Split the different divisions.
-fn split_divisions<'a,'b>(m: &'b mut Muncher<'a>) -> Result<[&'a [Token]; 3], Error> where 'b:'a {
+fn split_divisions<'a, 'b>(m: &'b mut Muncher<'a>) -> Result<[&'a [Token]; 3], Error>
+where
+    'b: 'a,
+{
     let proctkn = [Tkn::Kw(Kw::Procedure), Tkn::Kw(Kw::Division), Tkn::Dot];
     let datatkn = [Tkn::Kw(Kw::Data), Tkn::Kw(Kw::Division), Tkn::Dot];
     let envtkn = [Tkn::Kw(Kw::Environment), Tkn::Kw(Kw::Division), Tkn::Dot];

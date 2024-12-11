@@ -27,7 +27,10 @@ pub fn compile(m: &mut Muncher) -> Result<ProcDiv, Error> {
     m.skip_paragraphs();
     m.needem(&[Tkn::Kw(Kw::Procedure), Tkn::Kw(Kw::Division), Tkn::Dot])?;
     let mut statements: Vec<Statement> = Vec::new();
-    while !m.at_end() && m.peekem(&[Tkn::Kw(Kw::Data), Tkn::Kw(Kw::Division)]).is_none() {
+    while !m.at_end()
+        && m.peekem(&[Tkn::Kw(Kw::Data), Tkn::Kw(Kw::Division)])
+            .is_none()
+    {
         statements.push(statement(m)?);
     }
     Ok(ProcDiv { statements })

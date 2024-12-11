@@ -1,6 +1,7 @@
 use crate::src::{Error, Src};
 pub use kw::{Kw, KW_TAB};
 pub use token::{Tkn, Token};
+use tokenizer::tokenize;
 
 /// Handles various operations on the program tokens.
 pub struct Tokens {
@@ -9,7 +10,8 @@ pub struct Tokens {
 
 impl Tokens {
     pub fn new(sources: &[Src]) -> Result<Self, Error> {
-        todo!()
+        let t = tokenize(sources)?;
+        Ok(Self { tokens: t })
     }
 }
 
@@ -243,6 +245,7 @@ impl TokenHolder for &[Token] {
 
 mod kw;
 mod token;
+mod tokenizer;
 
 #[cfg(test)]
 mod tests {

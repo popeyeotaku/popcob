@@ -50,8 +50,8 @@ impl std::error::Error for Error {}
 
 /// Indicates a source file.
 pub struct Src {
-    filename: Rc<String>,
-    text: String,
+    pub filename: Rc<String>,
+    pub text: String,
 }
 
 impl Src {
