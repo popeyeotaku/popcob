@@ -1,4 +1,4 @@
-use crate::src;
+use crate::src::{self, Error};
 
 use super::Kw;
 
@@ -28,6 +28,11 @@ impl Token {
         }
     }
 
+    /// Construct an error from this token.
+    pub fn error(&self, msg: String) -> Error {
+        Error::new(self.pos.clone(), msg)
+    }
+
     /// Return a flag if this token matches the `Tkn` enum type given.
     #[inline]
     pub fn tkn(&self, other: Tkn) -> bool {
@@ -36,10 +41,9 @@ impl Token {
 }
 
 /// The type of a token.
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Tkn {
     Literal,
-    Word,
     Dot,
     Paragraph,
     Kw(Kw),

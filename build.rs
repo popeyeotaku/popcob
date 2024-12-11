@@ -11,7 +11,7 @@ fn main() {
     for kw in &kwlist {
         out.push_str(&format!("    \"{}\",\n", kw));
     }
-    out.push_str("];\n\n#[derive(PartialEq,Clone,Copy)]\npub enum Kw {\n");
+    out.push_str("];\n\n#[derive(PartialEq,Clone,Copy,Debug)]\npub enum Kw {\n");
     for kw in &kwlist {
         out.push_str(&format!("    {},\n", casecnv(kw)))
     }

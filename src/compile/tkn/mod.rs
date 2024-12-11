@@ -15,7 +15,7 @@ impl Tokens {
 
 /// Allows consuming tokens via Tkn match.
 pub struct Muncher<'a> {
-    tokens: &'a [Token],
+    pub tokens: &'a [Token],
     i: usize,
 }
 
@@ -24,12 +24,34 @@ impl<'a> Muncher<'a> {
         Self { tokens: tkns, i: 0 }
     }
 
+    /// Skip any leading paragraphs.
+    pub fn skip_paragraphs(&mut self) {
+        while self.grab(Tkn::Paragraph).is_some() {}
+    }
+
+    /// If we're out of tokens, issue an error.
+    pub fn early_eof(&mut self) -> Result<(), Error> {
+        if self.at_end() {
+            Err(self.error("unexpected end of file".to_owned()))
+        } else {
+            Ok(())
+        }
+    }
+
     /// Return a flag for if we're out of tokens.
+    #[inline]
     pub fn at_end(&self) -> bool {
         self.i >= self.tokens.len()
     }
 
+    /// Skip the next i tokens.
+    #[inline]
+    pub fn advance(&mut self, i: usize) {
+        self.i += i;
+    }
+
     /// Return the current token index.
+    #[inline]
     pub fn cur_index(&self) -> usize {
         self.i
     }
@@ -76,6 +98,32 @@ impl<'a> Muncher<'a> {
             Some(t)
         } else {
             None
+        }
+    }
+
+    /// Construct an error from the current tokne.
+    pub fn error(&self, msg: String) -> Error {
+        self.tokens
+            .get(self.i)
+            .unwrap_or(self.tokens.last().unwrap())
+            .error(msg)
+    }
+
+    /// If we can't grab the given token, issue an error.
+    pub fn need(&mut self, tkn: Tkn) -> Result<&'a Token, Error> {
+        if let Some(t) = self.grab(tkn) {
+            Ok(t)
+        } else {
+            Err(self.error(format!("expected {:?}", tkn)))
+        }
+    }
+
+    /// If we can't grab the given tokens, issue an error.
+    pub fn needem(&mut self, tkns: &[Tkn]) -> Result<Vec<&'a Token>, Error> {
+        if let Some(t) = self.grabem(tkns) {
+            Ok(t)
+        } else {
+            Err(self.error(format!("expected {:?}", tkns)))
         }
     }
 }
@@ -187,6 +235,12 @@ impl TokenHolder for Muncher<'_> {
     }
 }
 
+impl TokenHolder for &[Token] {
+    fn token_slice(&self) -> &[Token] {
+        self
+    }
+}
+
 mod kw;
 mod token;
 
@@ -217,7 +271,7 @@ mod tests {
             [Tkn::Kw(Kw::Data), Tkn::Kw(Kw::Division), Tkn::Dot],
             [Tkn::Kw(Kw::Environment), Tkn::Kw(Kw::Division), Tkn::Dot],
         ];
-        let mut i = Sentences {
+        let i = Sentences {
             tokens: &tkns,
             i: 0,
         };
@@ -251,7 +305,7 @@ mod tests {
             [Tkn::Kw(Kw::Data), Tkn::Kw(Kw::Division), Tkn::Dot],
             [Tkn::Kw(Kw::Environment), Tkn::Kw(Kw::Division), Tkn::Dot],
         ];
-        let mut i = Paragraphs {
+        let i = Paragraphs {
             tokens: &tkns,
             i: 0,
         };

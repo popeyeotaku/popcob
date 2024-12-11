@@ -14,7 +14,7 @@ pub static KW_TAB: [&str; 13] = [
     "IS",
 ];
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 pub enum Kw {
     Procedure,
     Division,
