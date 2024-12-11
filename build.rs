@@ -15,7 +15,27 @@ fn main() {
     for kw in &kwlist {
         out.push_str(&format!("    {},\n", casecnv(kw)))
     }
-    out.push_str("}\n");
+    out.push_str(
+        "}
+
+impl Kw {
+    pub fn findkw(s:&str) -> Option<Self> {
+        match s {\n",
+    );
+    for kw in &kwlist {
+        out.push_str(&format!(
+            "\t\t\t\"{}\" => Some(Self::{}),\n",
+            kw,
+            casecnv(kw)
+        ))
+    }
+    out.push_str(
+        "
+            _ => None
+        }
+    }
+}",
+    );
     fs::write("src/compile/tkn/kw.rs", out).unwrap();
 
     println!("cargo::rerun-if-changed=kw.txt")
