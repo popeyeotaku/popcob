@@ -1,4 +1,4 @@
-use std::{fmt::Display, rc::Rc};
+use std::{fmt::Display, ops::Add, rc::Rc};
 
 /// Indicates a position within a source file.
 #[derive(Clone, Debug)]
@@ -9,12 +9,18 @@ pub struct Pos {
 }
 
 impl Pos {
+    #[inline]
     pub fn new(filename: Rc<String>, linenum: u32, charpos: u16) -> Self {
         Self {
             filename,
             linenum,
             charpos,
         }
+    }
+
+    /// Return a clone of this Pos, except with the given character position.
+    pub fn with_charpos(&self, charpos: u16) -> Self {
+        Self::new(self.filename.clone(), self.linenum, charpos)
     }
 }
 
